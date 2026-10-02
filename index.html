@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PyAir — PRD</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#fff;--ink:#14213d;--muted:#5b6785;--line:#e3e8f2;
+  --brand:#1d6fe8;--brand2:#0fb5a6;--warn:#e8912d;--bad:#d64550;--ok:#1f9d63;
+  --soft:#eaf1fd;--shadow:0 4px 18px rgba(20,33,61,.07);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0d1424;--card:#151e33;--ink:#e8edf8;--muted:#98a4c0;--line:#25304c;
+  --brand:#5b9bff;--brand2:#2fd0c0;--soft:#1a2745;--shadow:none}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--brand)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+header.hero{background:linear-gradient(135deg,#0b3d91,#1d6fe8 55%,#0fb5a6);color:#fff;padding:56px 0 72px;position:relative;overflow:hidden}
+.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px);letter-spacing:-.5px}
+.hero p{margin:0;max-width:640px;opacity:.92;font-size:18px}
+.plane{position:absolute;right:-20px;top:20px;width:340px;opacity:.15;transform:rotate(-12deg)}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:6px 14px;border-radius:99px;font-size:14px}
+nav{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:4px;overflow-x:auto;padding:0 8px}
+nav a{padding:12px 12px;text-decoration:none;color:var(--muted);font-size:14px;white-space:nowrap;border-bottom:2px solid transparent}
+nav a:hover{color:var(--brand);border-color:var(--brand)}
+section{padding:44px 0 8px}
+h2{font-size:26px;margin:0 0 6px;letter-spacing:-.3px}
+.lead{color:var(--muted);margin:0 0 22px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 8px;font-size:17px}
+.card ul{margin:0;padding-left:18px;color:var(--muted)}
+.card li{margin:3px 0}
+.num{font-size:34px;font-weight:700;color:var(--brand)}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px}
+.must{background:#fde4e6;color:#a8323c}.could{background:#fdf0dc;color:#9a5a10}.done{background:#dcf5e8;color:#157a4a}.plan{background:var(--soft);color:var(--brand)}
+@media (prefers-color-scheme:dark){.must{background:#4a2227;color:#ff9aa3}.could{background:#47341a;color:#ffc47a}.done{background:#173a2b;color:#6fe0a8}}
+.role{border-top:4px solid var(--c)}
+.diagram{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:var(--shadow);overflow-x:auto}
+.diagram svg{display:block;margin:0 auto;min-width:640px;width:100%;height:auto}
+svg text{fill:var(--ink);font-family:inherit}
+svg .box{fill:var(--soft);stroke:var(--brand);stroke-width:1.5}
+svg .box2{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+svg .line{stroke:var(--muted);stroke-width:1.6;fill:none}
+svg .sub{fill:var(--muted);font-size:12px}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:15px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft);font-size:13px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+code{background:var(--soft);padding:1px 6px;border-radius:5px;font-size:.92em}
+.tablewrap{overflow-x:auto;border-radius:14px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 16px;border-radius:99px;cursor:pointer;font:inherit;font-size:14px}
+.tabs button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.pane{display:none}.pane.on{display:block}
+.timeline{position:relative;padding-left:28px}
+.timeline:before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.step{position:relative;margin-bottom:14px}
+.step:before{content:"";position:absolute;left:-26px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--card);border:3px solid var(--brand)}
+.step.ok:before{background:var(--ok);border-color:var(--ok)}
+.check{list-style:none;padding:0;margin:0;counter-reset:c}
+.check li{counter-increment:c;display:flex;gap:12px;padding:12px 16px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.check li:before{content:counter(c);flex:none;width:26px;height:26px;border-radius:50%;background:var(--brand2);color:#fff;font-weight:700;display:grid;place-items:center;font-size:13px}
+footer{padding:40px 0;color:var(--muted);font-size:14px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <svg class="plane" viewBox="0 0 24 24" fill="#fff"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+  <div class="wrap">
+    <h1>✈ PyAir</h1>
+    <p>Сайт авиакомпании: поиск рейсов, бронирование и отмена билетов, личный кабинет клиента и админка для сотрудников.</p>
+    <div class="meta">
+      <span class="chip">PRD v1.0 (черновик)</span>
+      <span class="chip">02.10.2026</span>
+      <span class="chip">Django 5.1+</span>
+      <span class="chip">SQLite → PostgreSQL</span>
+    </div>
+  </div>
+</header>
+
+<nav><div class="wrap">
+  <a href="#goals">Цели</a><a href="#roles">Роли</a><a href="#flow">Сценарий</a><a href="#reqs">Требования</a>
+  <a href="#data">Данные</a><a href="#routes">Маршруты</a><a href="#nfr">Нефункц.</a><a href="#plan">План</a><a href="#accept">Приёмка</a>
+</div></nav>
+
+<main class="wrap">
+
+<section id="goals">
+  <h2>Цели и контекст</h2>
+  <p class="lead">Проблема: без учётных записей клиент не видит все свои билеты в одном месте, а компания не знает, кому принадлежат брони.</p>
+  <div class="grid g3">
+    <div class="card"><div class="num">1</div><h3>Клиентский путь</h3><p style="margin:0;color:var(--muted)">Регистрация, поиск рейса, бронирование и отмена.</p></div>
+    <div class="card"><div class="num">2</div><h3>Изоляция данных</h3><p style="margin:0;color:var(--muted)">Клиент видит и меняет только свои брони.</p></div>
+    <div class="card"><div class="num">3</div><h3>Управление</h3><p style="margin:0;color:var(--muted)">Администратор управляет клиентами, рейсами и бронями.</p></div>
+    <div class="card"><div class="num">4</div><h3>Без овербукинга</h3><p style="margin:0;color:var(--muted)">Исключена двойная продажа мест.</p></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Не цели первой версии</h3>
+    <ul><li>Онлайн-оплата</li><li>Электронные билеты в PDF</li><li>Выбор места в салоне</li><li>Мобильное приложение</li></ul></div>
+</section>
+
+<section id="roles">
+  <h2>Роли и права</h2>
+  <p class="lead">Доступ к брони: <code>booking.user == request.user</code> или администратор. Чужая бронь по прямой ссылке — <b>404</b>.</p>
+  <div class="grid g3">
+    <div class="card role" style="--c:#8a96b3"><h3>👤 Гость</h3><ul><li>Поиск рейсов и цен</li><li>Регистрация</li><li>Вход</li></ul></div>
+    <div class="card role" style="--c:var(--brand)"><h3>🎫 Клиент</h3><ul><li>Всё, что гость</li><li>Бронирование</li><li>Список и детали своих броней</li><li>Отмена своих броней</li></ul></div>
+    <div class="card role" style="--c:var(--brand2)"><h3>🛠 Администратор</h3><ul><li>Всё, что клиент</li><li>CRUD аэропортов и рейсов</li><li>Все брони</li><li>Список клиентов</li></ul></div>
+  </div>
+</section>
+
+<section id="flow">
+  <h2>Путь пользователя</h2>
+  <p class="lead">От поиска до отмены: где требуется вход и что происходит с местами.</p>
+  <div class="diagram">
+  <svg viewBox="0 0 900 250" role="img" aria-label="Схема пользовательского пути">
+    <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+    <g class="box2"><rect x="10" y="40" width="140" height="70" rx="12" class="box2"/></g>
+    <text x="80" y="70" text-anchor="middle" font-weight="600">Поиск</text><text x="80" y="90" text-anchor="middle" class="sub">гость и клиент</text>
+    <path class="line" d="M150 75 H190" marker-end="url(#ar)"/>
+    <rect x="190" y="40" width="140" height="70" rx="12" class="box2"/>
+    <text x="260" y="70" text-anchor="middle" font-weight="600">Выбор рейса</text><text x="260" y="90" text-anchor="middle" class="sub">места ≥ пассажиров</text>
+    <path class="line" d="M330 75 H370" marker-end="url(#ar)"/>
+    <polygon points="440,30 510,75 440,120 370,75" class="box"/>
+    <text x="440" y="72" text-anchor="middle" font-weight="600">Вошёл?</text>
+    <path class="line" d="M440 120 V160 H260" marker-end="url(#ar)"/>
+    <text x="450" y="146" class="sub">нет</text>
+    <rect x="120" y="140" width="140" height="50" rx="12" class="box2"/>
+    <text x="190" y="170" text-anchor="middle" font-weight="600">Вход / регистрация</text>
+    <path class="line" d="M120 165 H60 V75" stroke-dasharray="4 4"/>
+    <path class="line" d="M510 75 H550" marker-end="url(#ar)"/>
+    <text x="520" y="66" class="sub">да</text>
+    <rect x="550" y="40" width="150" height="70" rx="12" class="box"/>
+    <text x="625" y="68" text-anchor="middle" font-weight="600">Бронь</text><text x="625" y="88" text-anchor="middle" class="sub">атомарное списание мест</text>
+    <path class="line" d="M700 75 H740" marker-end="url(#ar)"/>
+    <rect x="740" y="40" width="150" height="70" rx="12" class="box2"/>
+    <text x="815" y="68" text-anchor="middle" font-weight="600">Код брони</text><text x="815" y="88" text-anchor="middle" class="sub">6 символов</text>
+    <path class="line" d="M815 110 V160" marker-end="url(#ar)"/>
+    <rect x="740" y="160" width="150" height="70" rx="12" class="box2"/>
+    <text x="815" y="188" text-anchor="middle" font-weight="600">Мои брони</text><text x="815" y="208" text-anchor="middle" class="sub">/my/ → отмена</text>
+    <path class="line" d="M740 195 H640" marker-end="url(#ar)"/>
+    <rect x="490" y="170" width="150" height="50" rx="12" class="box2"/>
+    <text x="565" y="200" text-anchor="middle" font-weight="600">Места возвращены</text>
+  </svg></div>
+</section>
+
+<section id="reqs">
+  <h2>Функциональные требования</h2>
+  <p class="lead">Приоритеты: <span class="badge must">Must</span> <span class="badge could">Could</span></p>
+  <div class="tabs" id="tabs"></div>
+
+  <div class="pane on" data-t="Аккаунты"><div class="tablewrap"><table>
+   <tr><th>ID</th><th>Требование</th><th>Приоритет</th></tr>
+   <tr><td>A-1</td><td>Регистрация (логин, email, пароль + подтверждение) через <code>UserCreationForm</code></td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>A-2</td><td>Вход и выход (<code>django.contrib.auth</code>)</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>A-3</td><td>Пароли только в виде хэша</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>A-4</td><td>Редирект на вход при попытке бронирования без авторизации</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>A-5</td><td>Сброс пароля и подтверждение email (v2)</td><td><span class="badge could">Could</span></td></tr></table></div></div>
+
+  <div class="pane" data-t="Поиск"><div class="tablewrap"><table>
+   <tr><th>ID</th><th>Требование</th><th>Приоритет</th></tr>
+   <tr><td>S-1</td><td>Форма: откуда, куда, дата, пассажиры (1–9)</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>S-2</td><td>Города различаются; дата не в прошлом</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>S-3</td><td>Только будущие рейсы выбранной даты, по времени</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>S-4</td><td>В карточке: вылет/прилёт, номер, цена, свободные места</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>S-5</td><td>Мест не хватает — пометка, кнопка «Выбрать» неактивна</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>S-6</td><td>Поиск доступен гостям</td><td><span class="badge must">Must</span></td></tr></table></div></div>
+
+  <div class="pane" data-t="Бронирование"><div class="tablewrap"><table>
+   <tr><th>ID</th><th>Требование</th><th>Приоритет</th></tr>
+   <tr><td>B-1</td><td>Форма: ФИО, email, число пассажиров</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>B-2</td><td>Привязка к пользователю (<code>Booking.user</code>)</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>B-3</td><td>Атомарное списание мест: условный <code>UPDATE</code> с <code>F()</code> в <code>transaction.atomic</code></td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>B-4</td><td>При нехватке мест — сообщение, бронь не создаётся</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>B-5</td><td>Уникальный код брони (6 символов)</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>B-6</td><td>Сумма = цена × число пассажиров</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>B-7</td><td>Данные каждого пассажира отдельно (v2)</td><td><span class="badge could">Could</span></td></tr></table></div></div>
+
+  <div class="pane" data-t="Личный кабинет"><div class="tablewrap"><table>
+   <tr><th>ID</th><th>Требование</th><th>Приоритет</th></tr>
+   <tr><td>C-1</td><td>«Мои бронирования»: только свои, новые сверху</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>C-2</td><td>Страница брони: код, статус, пассажир, рейс, время, сумма</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>C-3</td><td>Отмена с подтверждением; места возвращаются</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>C-4</td><td>Повторная отмена невозможна (идемпотентность)</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>C-5</td><td>Чужая бронь → 404</td><td><span class="badge must">Must</span></td></tr></table></div></div>
+
+  <div class="pane" data-t="Админка"><div class="tablewrap"><table>
+   <tr><th>ID</th><th>Требование</th><th>Приоритет</th></tr>
+   <tr><td>M-1</td><td>Django Admin: аэропорты, рейсы, брони, пользователи</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>M-2</td><td>В списке броней: код, клиент, пассажир, рейс, билеты, сумма, статус, дата</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>M-3</td><td>Фильтры (статус, рейс, маршрут) и поиск (код, ФИО, email, логин)</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>M-4</td><td>Код и дата создания — только чтение</td><td><span class="badge must">Must</span></td></tr>
+   <tr><td>M-5</td><td>Группа «Менеджер» с ограниченными правами</td><td><span class="badge could">Could</span></td></tr>
+   <tr><td>M-6</td><td>Команда <code>seed</code> для тестовых данных</td><td><span class="badge must">Must</span></td></tr></table></div></div>
+</section>
+
+<section id="data">
+  <h2>Модель данных</h2>
+  <p class="lead">Пользователь → брони → рейс → аэропорты (вылет и прилёт).</p>
+  <div class="diagram">
+  <svg viewBox="0 0 900 330" role="img" aria-label="ER-диаграмма">
+    <rect x="10" y="100" width="170" height="110" rx="12" class="box2"/>
+    <rect x="10" y="100" width="170" height="30" rx="12" class="box"/>
+    <text x="95" y="121" text-anchor="middle" font-weight="700">User</text>
+    <text x="24" y="156" class="sub">django.contrib.auth</text>
+    <text x="24" y="176" class="sub">username, email</text>
+    <text x="24" y="196" class="sub">password (хэш), is_staff</text>
+
+    <rect x="260" y="20" width="230" height="290" rx="12" class="box2"/>
+    <rect x="260" y="20" width="230" height="30" rx="12" class="box"/>
+    <text x="375" y="41" text-anchor="middle" font-weight="700">Booking</text>
+    <g class="sub"><text x="274" y="76">reference (unique)</text><text x="274" y="100">user → User <tspan fill="var(--brand)">новое</tspan></text>
+    <text x="274" y="124">flight → Flight</text><text x="274" y="148">passenger_name</text><text x="274" y="172">email</text>
+    <text x="274" y="196">passengers (1–9)</text><text x="274" y="220">total_price</text>
+    <text x="274" y="244">status: confirmed / cancelled</text><text x="274" y="268">created_at</text></g>
+
+    <rect x="570" y="20" width="230" height="200" rx="12" class="box2"/>
+    <rect x="570" y="20" width="230" height="30" rx="12" class="box"/>
+    <text x="685" y="41" text-anchor="middle" font-weight="700">Flight</text>
+    <g class="sub"><text x="584" y="76">flight_number</text><text x="584" y="100">origin, destination → Airport</text>
+    <text x="584" y="124">departure, arrival</text><text x="584" y="148">price (Decimal)</text>
+    <text x="584" y="172">seats_total, seats_free</text><text x="584" y="196">CHECK: seats_free ≤ total</text></g>
+
+    <rect x="620" y="250" width="230" height="70" rx="12" class="box2"/>
+    <rect x="620" y="250" width="230" height="28" rx="12" class="box"/>
+    <text x="735" y="270" text-anchor="middle" font-weight="700">Airport</text>
+    <text x="634" y="298" class="sub">code (PK, IATA), city, name</text>
+
+    <path class="line" d="M180 155 H260"/><text x="195" y="146" class="sub">1</text><text x="236" y="146" class="sub">∞</text>
+    <path class="line" d="M490 120 H570"/><text x="500" y="111" class="sub">∞</text><text x="552" y="111" class="sub">1</text>
+    <path class="line" d="M700 220 V250"/><text x="706" y="238" class="sub">∞ — 1</text>
+  </svg></div>
+</section>
+
+<section id="routes">
+  <h2>Страницы и маршруты</h2>
+  <p class="lead">Нажмите на фильтр, чтобы показать маршруты нужной роли.</p>
+  <div class="tabs" id="rtabs">
+    <button class="on" data-f="all">Все</button><button data-f="guest">Гость</button><button data-f="client">Клиент</button><button data-f="admin">Админ</button>
+  </div>
+  <div class="tablewrap"><table id="rt">
+    <tr><th>URL</th><th>Доступ</th><th>Назначение</th></tr>
+    <tr data-r="guest client admin"><td><code>/</code></td><td>все</td><td>Поиск и результаты</td></tr>
+    <tr data-r="guest"><td><code>/accounts/register/</code></td><td>гость</td><td>Регистрация</td></tr>
+    <tr data-r="guest client admin"><td><code>/accounts/login/</code> · <code>logout/</code></td><td>все</td><td>Вход / выход</td></tr>
+    <tr data-r="client admin"><td><code>/book/&lt;flight_id&gt;/</code></td><td>клиент</td><td>Форма бронирования</td></tr>
+    <tr data-r="client admin"><td><code>/my/</code></td><td>клиент</td><td>Мои брони</td></tr>
+    <tr data-r="client admin"><td><code>/booking/&lt;reference&gt;/</code></td><td>владелец, админ</td><td>Детали брони</td></tr>
+    <tr data-r="client admin"><td><code>/booking/&lt;reference&gt;/cancel/</code> POST</td><td>владелец, админ</td><td>Отмена брони</td></tr>
+    <tr data-r="admin"><td><code>/admin/</code></td><td>админ</td><td>Управление данными</td></tr>
+  </table></div>
+</section>
+
+<section id="nfr">
+  <h2>Нефункциональные требования</h2>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card"><h3>🔒 Безопасность</h3><ul><li>CSRF на всех POST</li><li>ORM, параметризованные запросы</li><li><code>SECRET_KEY</code> из окружения</li><li>DEBUG=False в проде</li><li>Проверка владельца брони</li></ul></div>
+    <div class="card"><h3>🧱 Целостность</h3><ul><li>Места не уходят в минус</li><li>Нет двойной продажи при параллельных запросах</li><li>Атомарные операции + CHECK в БД</li></ul></div>
+    <div class="card"><h3>⚡ Производительность</h3><ul><li>Индекс (origin, destination, departure)</li><li><code>select_related</code></li><li>&lt; 500 мс при 10 000 рейсов</li></ul></div>
+    <div class="card"><h3>📈 Масштабирование</h3><ul><li>PostgreSQL сменой <code>DATABASES</code></li><li>gunicorn + nginx</li></ul></div>
+    <div class="card"><h3>🌍 Локализация</h3><ul><li><code>LANGUAGE_CODE='ru'</code></li><li><code>Europe/Moscow</code>, <code>USE_TZ=True</code></li></ul></div>
+    <div class="card"><h3>✅ Качество</h3><ul><li>Автотесты ключевых сценариев</li><li>Миграции в git</li></ul></div>
+  </div>
+</section>
+
+<section id="plan">
+  <h2>План работ</h2>
+  <p class="lead">Базовая версия готова, дальше личные кабинеты, роли и продакшен.</p>
+  <div class="timeline">
+    <div class="step ok card"><b>Этап 1</b> <span class="badge done">готово</span><br><span style="color:var(--muted)">Модели, поиск, бронирование, отмена, админка, seed, тесты</span></div>
+    <div class="step card"><b>Этап 2</b> <span class="badge plan">0.5 дня</span><br><span style="color:var(--muted)">Поле <code>Booking.user</code>, миграция, регистрация, вход и выход</span></div>
+    <div class="step card"><b>Этап 3</b> <span class="badge plan">0.5 дня</span><br><span style="color:var(--muted)"><code>@login_required</code>, «Мои бронирования», фильтр по владельцу, 404 для чужих</span></div>
+    <div class="step card"><b>Этап 4</b> <span class="badge plan">0.5 дня</span><br><span style="color:var(--muted)">Колонка и фильтр «Клиент» в админке, обновление тестов</span></div>
+    <div class="step card"><b>Этап 5</b> <span class="badge plan">1 день</span><br><span style="color:var(--muted)">PostgreSQL, настройки продакшена, деплой</span></div>
+  </div>
+
+  <h3 style="margin:28px 0 10px">Открытые вопросы</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Вопрос</th><th>Предположение</th></tr>
+    <tr><td>Бронирование гостям без регистрации?</td><td>Нет, только зарегистрированным</td></tr>
+    <tr><td>Старые брони без пользователя?</td><td><code>user</code> временно необязательное; миграция привязывает по email</td></tr>
+    <tr><td>Подтверждение email и сброс пароля?</td><td>Нет; письма в консоль</td></tr>
+    <tr><td>Роль «Менеджер»?</td><td>Нет, достаточно клиента и админа</td></tr>
+    <tr><td>Политика отмены?</td><td>Всегда, без штрафов</td></tr>
+  </table></div>
+
+  <h3 style="margin:28px 0 10px">Будущие улучшения (v2+)</h3>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    <span class="badge plan">Онлайн-оплата</span><span class="badge plan">Письма-подтверждения</span><span class="badge plan">Билет в PDF</span>
+    <span class="badge plan">Выбор места</span><span class="badge plan">Данные каждого пассажира</span><span class="badge plan">Туда-обратно</span>
+    <span class="badge plan">Роль «Менеджер»</span><span class="badge plan">REST API (DRF)</span><span class="badge plan">Bootstrap/Tailwind</span><span class="badge plan">Многоязычность</span>
+  </div>
+</section>
+
+<section id="accept">
+  <h2>Критерии приёмки</h2>
+  <p class="lead">Отметьте выполненные пункты.</p>
+  <ol class="check" id="ac">
+    <li>Гость находит рейсы по маршруту и дате, но при бронировании перенаправляется на вход.</li>
+    <li>Новый клиент регистрируется, входит и оформляет бронь; места уменьшаются на число пассажиров.</li>
+    <li>Бронь на больше мест, чем свободно, не создаётся и показывает сообщение.</li>
+    <li>Клиент A видит только свои брони; брони клиента B по URL дают 404.</li>
+    <li>Отмена меняет статус на «Отменено» и возвращает места; повторная отмена ничего не меняет.</li>
+    <li>Администратор в <code>/admin/</code> видит всех клиентов и брони, ищет и фильтрует.</li>
+    <li>Все автотесты проходят: <code>python manage.py test</code>.</li>
+  </ol>
+  <div class="card" style="margin-top:14px"><h3>Обязательные тесты</h3>
+    <ul><li>поиск</li><li>бронь списывает места</li><li>отмена возвращает места</li><li>перебронирование невозможно</li><li>клиент не видит чужую бронь</li><li>гость не может бронировать</li><li>админ видит все брони</li></ul></div>
+</section>
+
+</main>
+<footer>PyAir · PRD v1.0 · 02.10.2026</footer>
+
+<script>
+// Вкладки требований
+const panes=[...document.querySelectorAll('.pane')],tabs=document.getElementById('tabs');
+panes.forEach((p,i)=>{const b=document.createElement('button');b.textContent=p.dataset.t;if(!i)b.className='on';
+  b.onclick=()=>{panes.forEach(x=>x.classList.remove('on'));p.classList.add('on');[...tabs.children].forEach(x=>x.classList.remove('on'));b.classList.add('on')};
+  tabs.appendChild(b)});
+// Фильтр маршрутов
+document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#rtabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  document.querySelectorAll('#rt tr[data-r]').forEach(r=>r.style.display=(b.dataset.f==='all'||r.dataset.r.includes(b.dataset.f))?'':'none')});
+// Чекбоксы приёмки
+document.querySelectorAll('#ac li').forEach(li=>li.onclick=()=>{
+  const d=li.style.opacity==='.55';li.style.opacity=d?'1':'.55';li.style.textDecoration=d?'none':'line-through'});
+</script>
+</body>
+</html>
